@@ -25,7 +25,9 @@ export class AppComponent implements OnInit{
     if(b==1){
       this.pStatus=true;
       this.nstatus=false;
-      }if(b==10){
+      }
+      
+      if(b==10){
         this.nstatus=true;
         this.pStatus=false;
       }
