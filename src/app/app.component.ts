@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import * as data from'../app/data/data.json';
 import * as jspdf from 'jspdf';
 import html2canvas from 'html2canvas';
-import * as html2pdf from 'html2pdf.js'
+import * as html2pdf from 'html2pdf.js';
+import { ExportAsService, ExportAsConfig } from 'ngx-export-as';
+
 
 
 @Component({
@@ -17,7 +19,11 @@ export class AppComponent implements OnInit{
   info=(data as any).default;
   data1: any[]=this.info;
   public id:string;
-  constructor() { }
+  config: ExportAsConfig = {
+    type: 'pdf',
+    elementId: 'mytable',
+    };
+  constructor(private exportAsService: ExportAsService) { }
   ngOnInit(): void {
 
   }
@@ -68,9 +74,17 @@ export class AppComponent implements OnInit{
       }
     }
     
-    
-    download(){
-    var data = document.getElementById('contentToConvert');
+  
+    /* download(){
+
+      html2canvas(document.getElementById('contentToConvert')).then(
+        canvas=>{
+          console.log(canvas)
+          var getImage=canvas.toDataURL();
+          console.log(getImage);    
+        }
+      )
+    /*var data = document.getElementById('contentToConvert');
     html2canvas(data).then(canvas => {
     // Few necessary setting options
     var imgWidth = 208;
@@ -87,12 +101,12 @@ export class AppComponent implements OnInit{
       html2canvas:{},jsPDF:{orientation:'landscape'}
     };
     const content:Element=document.getElementById('contentToConvert');
-    html2pdf().from(content).set(options).save();*/
+    html2pdf().from(content).set(options).save();}*/
 
-    
+  
     
 
-  }
+  
   }
 
 
