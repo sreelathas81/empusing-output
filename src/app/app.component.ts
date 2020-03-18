@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import * as data from'../app/data/data.json';
-import * as jspdf from 'jspdf';
-import html2canvas from 'html2canvas';
-import * as html2pdf from 'html2pdf.js';
-import { ExportAsService, ExportAsConfig } from 'ngx-export-as';
+import { Component, Input, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { details } from './models/datamodel';
 
+import { ApiService } from './services/api.service';
+import { HttpClient } from '@angular/common/http';
+import { Papa } from 'ngx-papaparse';
+import { NgForm } from '@angular/forms';
 
 
 @Component({
@@ -12,21 +13,35 @@ import { ExportAsService, ExportAsConfig } from 'ngx-export-as';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit{
-  pStatus=false;
-  nstatus: any;
-  showSpinner:boolean=false;
-  info=(data as any).default;
-  data1: any[]=this.info;
-  public id:string;
-  config: ExportAsConfig = {
-    type: 'pdf',
-    elementId: 'mytable',
-    };
-  constructor(private exportAsService: ExportAsService) { }
-  ngOnInit(): void {
+export class AppComponent {
+  id: any;
+  showSpinner: any;
+  pStatus: boolean;
+  nstatus: boolean;
+  hide: boolean=true;
+  formhide: boolean;
+  data1: any = [];
+  hhide=true;
+  dataObj:Object={};
+  csvdata:any=[];
+  csvdetails:Object={};
+  headerRow:any=[];
+  fileData: File = null;
+  previewUrl:any = null;
+  details:any=[];
+  fileContent:string='';
+  files
 
-  }
+
+  constructor(private http:HttpClient,private papa:Papa) {}
+
+  ngOnInit(){
+      this.http.get("http://localhost:5555/data").subscribe((res:Response)=>{
+        this.data1=res;
+        console.log(this.data1)
+      })
+    }
+
   save(b,c)
   {
     this.id=b;
@@ -54,6 +69,8 @@ export class AppComponent implements OnInit{
             if(this.id===this.data1[0].id){
               this.pStatus=true;
               this.nstatus=false;
+            }else{
+              this.nstatus=false;
             }
             
         }
@@ -64,54 +81,80 @@ export class AppComponent implements OnInit{
       for( let i=0;i<this.data1.length-1;i++){
         if(this.id===this.data1[i].id){
             this.id=this.data1[i+1].id;
-            console.log(this.data1[this.data1.length-1]);
             if(this.id===this.data1[this.data1.length-1].id){
               this.nstatus=true;
               this.pStatus=false;
+            }else{
+              this.nstatus=false;
             }
             break;
         }
       }
     }
-    
-  
-    /* download(){
+    newEmployee(){
+      this.hide=false;
+      this.formhide=false;
 
-      html2canvas(document.getElementById('contentToConvert')).then(
-        canvas=>{
-          console.log(canvas)
-          var getImage=canvas.toDataURL();
-          console.log(getImage);    
-        }
-      )
-    /*var data = document.getElementById('contentToConvert');
-    html2canvas(data).then(canvas => {
-    // Few necessary setting options
-    var imgWidth = 208;
-    var imgHeight = canvas.height * imgWidth / canvas.width;
- 
-    const contentDataURL = canvas.toDataURL('jpeg')
-    let pdf = new jspdf('p', 'mm', 'a4'); // A4 size page of PDF
-    pdf.addImage(contentDataURL, 'jpeg', 0, 0, imgWidth, imgHeight)
-    pdf.save('employee.pdf'); // Generated PDF
-    });
-   /* const options={
-      filename:'eee.pdf',
-      image:{type:'png'},
-      html2canvas:{},jsPDF:{orientation:'landscape'}
-    };
-    const content:Element=document.getElementById('contentToConvert');
-    html2pdf().from(content).set(options).save();}*/
+    }
+   
+    onSubmit(values){
+      
+    this.dataObj={
+      "id":values.id,
+      "name":values.name,
+      "Position":values.Position,
+      "imageURL":values.imageURL,
+      "gender":values.gender,
+      "DOB":values.DOB,
+      "joiningDate":values.joiningDate,
+      "location":values.location
+    }
+    this.http.post("http://localhost:5555/data",this.dataObj).subscribe(
+      (res:Response)=>{
+        console.log(res)
+      }
+    )
+    }
+    importfile(){
+      this.hhide=false;
+    }
+   
+  extractdata(res){
+    let csvData =res || "";
+    this.papa.parse(csvData,{
+      complete:parsedData=>{
+          this.headerRow=parsedData.data.splice(0,1)[0];
+          this.csvdata=parsedData.data;
+          this.csvdetails={
+            "id":parsedData.data[0][0],
+             "name":parsedData.data[0][1],
+             "Position":parsedData.data[0][2],
+              "imageURL":parsedData.data[0][3],
+              "gender":parsedData.data[0][4],
+              "DOB":parsedData.data[0][5],
+              "joiningDate":parsedData.data[0][6],
+              "location":parsedData.data[0][7]
+          }
+          this.http.post("http://localhost:5555/data",this.csvdetails).subscribe(
+            (res:Response)=>{
+              console.log(res)
+            }
+          )
+      }
+    })
 
-  
-    
-
-  
   }
+ 
+  getFiles(event){
+      this.files=event.target.files
+    console.log(this.files[0].name);
+  }
+  send(){
+    const url=`${"assets"}/${this.files[0].name}`;
+    this.http.get(url,{responseType:'text'}).subscribe(
+      data=>this.extractdata(data)
+    )
+}
 
-
-
-
-
-
-
+    
+}
