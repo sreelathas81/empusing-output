@@ -1,11 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { details } from './models/datamodel';
-
-import { ApiService } from './services/api.service';
+import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Papa } from 'ngx-papaparse';
-import { NgForm } from '@angular/forms';
 
 
 @Component({
@@ -112,8 +107,7 @@ export class AppComponent {
     this.http.post("http://localhost:5555/data",this.dataObj).subscribe(
       (res:Response)=>{
         console.log(res)
-      }
-    )
+      })
     }
     importfile(){
       this.hhide=false;
