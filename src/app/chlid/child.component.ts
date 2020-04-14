@@ -1,7 +1,6 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { HttpClient} from '@angular/common/http';
 import {HttpHeaders} from '@angular/common/http';
-import  * as dd from 'rxjs/add/operator/toPromise';
 
 
 
@@ -25,11 +24,7 @@ private  headers=new HttpHeaders({'Content-type':'application/json'});
   this.http.get("http://localhost:5555/data").subscribe((res:Response)=>{
     this.info=res;
   })
-     /* this.api.getdata()
-      .subscribe(data => {
-        this.info=data;
-        console.log(data);
-      });*/
+     
     
   
   
