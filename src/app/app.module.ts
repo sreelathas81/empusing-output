@@ -11,12 +11,14 @@ import {MatRadioModule} from '@angular/material/radio';
 import{PapaParseModule} from 'ngx-papaparse';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {FormsModule} from '@angular/forms';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    ChildComponent
+    ChildComponent,
+    PageNotFoundComponent
   ],
   imports: [
     BrowserModule,
